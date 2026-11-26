@@ -129,19 +129,19 @@ class BoringViewModel: NSObject, ObservableObject {
     }
 
     func toggleCameraPreview() {
-        if isRequestingAuthorization {
+        if isCameraExpanded {
+            webcamManager.stopSession()
+            isCameraExpanded = false
             return
         }
 
+        isCameraExpanded = true
+        webcamManager.checkAndRequestVideoAuthorization()
+        webcamManager.checkCameraAvailability()
+
         switch webcamManager.authorizationStatus {
         case .authorized:
-            if webcamManager.isSessionRunning {
-                webcamManager.stopSession()
-                isCameraExpanded = false
-            } else if webcamManager.cameraAvailable {
-                webcamManager.startSession()
-                isCameraExpanded = true
-            }
+            webcamManager.startSession()
 
         case .denied, .restricted:
             DispatchQueue.main.async {
@@ -165,11 +165,7 @@ class BoringViewModel: NSObject, ObservableObject {
             }
 
         case .notDetermined:
-            isRequestingAuthorization = true
-            webcamManager.checkAndRequestVideoAuthorization()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self.isRequestingAuthorization = false
-            }
+            break
 
         default:
             break

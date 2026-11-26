@@ -437,7 +437,7 @@ struct NotchHomeView: View {
     }
 
     private var shouldShowCamera: Bool {
-        Defaults[.showMirror] && webcamManager.cameraAvailable && vm.isCameraExpanded
+        vm.isCameraExpanded
     }
 
     private var mainContent: some View {
@@ -456,10 +456,11 @@ struct NotchHomeView: View {
 
             if shouldShowCamera {
                 CameraPreviewView(webcamManager: webcamManager)
-                    .scaledToFit()
+                    .frame(width: showCalendar ? 150 : 200)
                     .opacity(vm.notchState == .closed ? 0 : 1)
                     .blur(radius: vm.notchState == .closed ? 20 : 0)
                     .animation(.interactiveSpring(response: 0.32, dampingFraction: 0.76, blendDuration: 0), value: shouldShowCamera)
+                    .transition(.opacity)
             }
         }
         .transition(.asymmetric(insertion: .opacity.combined(with: .move(edge: .top)), removal: .opacity))
