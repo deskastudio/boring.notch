@@ -99,14 +99,16 @@ struct BoringHeader: View {
                         .buttonStyle(PlainButtonStyle())
 
                         Button(action: {
-                            let script = """
-                            tell application "System Events"
-                                tell appearance preferences
-                                    set dark mode to not dark mode
+                            Task {
+                                let script = """
+                                tell application "System Events"
+                                    tell appearance preferences
+                                        set dark mode to not dark mode
+                                    end tell
                                 end tell
-                            end tell
-                            """
-                            try? AppleScriptHelper.executeVoid(script)
+                                """
+                                try? await AppleScriptHelper.executeVoid(script)
+                            }
                         }) {
                             Capsule()
                                 .fill(.black)
