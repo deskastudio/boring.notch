@@ -1,0 +1,44 @@
+name: Build Custom Boring Notch
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Boring Notch App
+    runs-on: macos-14
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Resolve Swift Packages
+        run: |
+          xcodebuild -resolvePackageDependencies -project boringNotch.xcodeproj
+
+      - name: Build App
+        run: |
+          xcodebuild -project boringNotch.xcodeproj \
+            -scheme boringNotch \
+            -configuration Release \
+            -destination 'generic/platform=macOS' \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CONFIGURATION_BUILD_DIR="$RUNNER_TEMP/build" \
+            clean build
+
+      - name: Archive App Bundle
+        run: |
+          cd "$RUNNER_TEMP/build"
+          codesign --force --deep --sign - "boringNotch.app" || true
+          ditto -c -k --keepParent "boringNotch.app" "$GITHUB_WORKSPACE/boringNotch-custom.zip"
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: boringNotch-custom
+          path: boringNotch-custom.zip
+          retention-days: 7
