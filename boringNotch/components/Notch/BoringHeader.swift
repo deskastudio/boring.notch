@@ -68,14 +68,57 @@ struct BoringHeader: View {
                                     .fill(.black)
                                     .frame(width: 30, height: 30)
                                     .overlay {
-                                        Image(systemName: "web.camera")
-                                            .foregroundColor(.white)
+                                        Image(systemName: vm.isCameraExpanded ? "camera.fill" : "camera")
+                                            .foregroundColor(vm.isCameraExpanded ? .white : .gray)
                                             .padding()
                                             .imageScale(.medium)
                                     }
                             }
                             .buttonStyle(PlainButtonStyle())
                         }
+
+                        Button(action: {
+                            vm.close()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                let task = Process()
+                                task.launchPath = "/usr/sbin/screencapture"
+                                task.arguments = ["-i", "-c"]
+                                try? task.run()
+                            }
+                        }) {
+                            Capsule()
+                                .fill(.black)
+                                .frame(width: 30, height: 30)
+                                .overlay {
+                                    Image(systemName: "camera.viewfinder")
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .imageScale(.medium)
+                                }
+                        }
+                        .buttonStyle(PlainButtonStyle())
+
+                        Button(action: {
+                            let script = """
+                            tell application "System Events"
+                                tell appearance preferences
+                                    set dark mode to not dark mode
+                                end tell
+                            end tell
+                            """
+                            try? AppleScriptHelper.executeVoid(script)
+                        }) {
+                            Capsule()
+                                .fill(.black)
+                                .frame(width: 30, height: 30)
+                                .overlay {
+                                    Image(systemName: "moon.stars.fill")
+                                        .foregroundColor(.white)
+                                        .padding()
+                                        .imageScale(.medium)
+                                }
+                        }
+                        .buttonStyle(PlainButtonStyle())
                         if Defaults[.settingsIconInNotch] {
                             Button(action: {
                                 DispatchQueue.main.async {

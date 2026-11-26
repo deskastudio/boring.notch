@@ -659,9 +659,9 @@ class MusicManager: ObservableObject {
         }
     }
     func openMusicApp() {
-        guard let bundleID = bundleIdentifier else {
-            print("Error: appBundleIdentifier is nil")
-            return
+        var bundleID = bundleIdentifier ?? "com.github.th-ch.youtube-music"
+        if bundleID == "com.apple.Music" {
+            bundleID = "com.github.th-ch.youtube-music"
         }
 
         let workspace = NSWorkspace.shared

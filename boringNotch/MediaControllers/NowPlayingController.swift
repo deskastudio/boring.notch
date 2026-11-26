@@ -16,7 +16,7 @@ final class NowPlayingController: ObservableObject, MediaControllerProtocol {
 
     // MARK: - Properties
     @Published private(set) var playbackState: PlaybackState = .init(
-        bundleIdentifier: "com.apple.Music"
+        bundleIdentifier: "com.github.th-ch.youtube-music"
     )
 
     var playbackStatePublisher: AnyPublisher<PlaybackState, Never> {
